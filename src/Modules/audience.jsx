@@ -10,7 +10,8 @@ const ViewAudience = () => {
   const [submittedPayload, setSubmittedPayload] = useState(null);
   const showDrawer = () => setOpen(true);
   const onClose = () => setOpen(false);
-
+  const WEBHOOK_URL =
+    "https://webhook.site/4f148bae-4c9d-49b1-94e5-ac973fb6ece1";
   const schemaOptions = [
     { id: 1, label: "First Name", value: "first_name", traits: "user" },
     { id: 2, label: "Last Name", value: "last_name", traits: "user" },
@@ -37,7 +38,7 @@ const ViewAudience = () => {
         !selectedValues.includes(option.value) || option.value === currentValue
     );
   };
-  const onFinish = (values) => {
+  const onFinish = async (values) => {
     const payload = {
       segment_name: values.segment_name,
       schema: (values.schema || []).map((item) => {
@@ -49,11 +50,25 @@ const ViewAudience = () => {
           : {};
       }),
     };
+
     setSubmittedPayload(payload);
+
+    try {
+      await fetch(WEBHOOK_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+        mode: "no-cors",
+      });
+      console.log("Payload sent to webhook successfully!");
+    } catch (error) {
+      console.error("Error sending payload to webhook:", error);
+    }
 
     setTimeout(() => {
       setSubmittedPayload(null);
     }, 6000);
+
     form.resetFields();
     setOpen(false);
   };
