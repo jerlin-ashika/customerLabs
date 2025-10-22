@@ -7,6 +7,7 @@ const ViewAudience = () => {
   const [open, setOpen] = useState(false);
   const [form] = Form.useForm();
   const [updateKey, setUpdateKey] = useState(0);
+  const [submittedPayload, setSubmittedPayload] = useState(null);
   const showDrawer = () => setOpen(true);
   const onClose = () => setOpen(false);
 
@@ -26,7 +27,6 @@ const ViewAudience = () => {
   const getAvailableOptions = (currentIndex) => {
     const selectedValues =
       form.getFieldValue("schema")?.map((s) => s?.sub_schema) || [];
-    // exclude value of current row
     const currentValue = form.getFieldValue([
       "schema",
       currentIndex,
@@ -49,18 +49,28 @@ const ViewAudience = () => {
           : {};
       }),
     };
-    console.log("Payload to send:", payload);
-    form.resetFields();
-     setOpen(false);
-  };
+    setSubmittedPayload(payload);
 
+    setTimeout(() => {
+      setSubmittedPayload(null);
+    }, 6000);
+    form.resetFields();
+    setOpen(false);
+  };
   const handleClose = () => {
     form.resetFields();
     setOpen(false);
   };
   return (
     <>
-      <Button onClick={showDrawer} className="min-w-[20vw]">Save Segment</Button>
+      <Button onClick={showDrawer} className="min-w-[20vw]">
+        Save Segment
+      </Button>
+      {submittedPayload && (
+        <div className="p-4 mt-4 bg-gray-100 border rounded">
+          <pre>{JSON.stringify(submittedPayload, null, 2)}</pre>
+        </div>
+      )}
       <Drawer
         title="Saving Segment"
         closable
